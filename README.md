@@ -43,7 +43,10 @@ The script will save the tidy data set (as per requirements) in a text file call
 The code book for this project is in CodeBook.md
 
 ## R Script steps
-Download and unzip the dataset if not already in the current folder
+
+0) Download and unzip the dataset if not already in the current folder
+
+```
 if (!file.exists('UCI HAR Dataset')) {
   zipfile <- 'uci_dataset.zip'
   download.file(
@@ -53,7 +56,11 @@ if (!file.exists('UCI HAR Dataset')) {
   unzip(zipfile, overwrite = TRUE); file.remove(zipfile)
 }
 setwd("./UCI HAR Dataset")
-Merges the training and the test sets to create one data set.
+```
+
+1) Merges the training and the test sets to create one data set.
+
+```
 # Load features and activities lookups
 features <-
   read_delim("features.txt", col_names = FALSE, delim = ' ') %>% pull(var = 2)
@@ -62,7 +69,7 @@ activities <-
              col_names = c("code", "activity"),
              delim = ' ')
 
-### Helper function
+# Helper function
 .load <- function(type, dir = getwd()) {
   xdata <-
     read_delim(
@@ -85,15 +92,27 @@ activities <-
 testdata <- .load('test')
 traindata <- .load('train')
 alldata <- bind_rows(traindata, testdata)
-Extracts only the measurements on the mean and standard deviation for each measurement.
+```
+
+2) Extracts only the measurements on the mean and standard deviation for each measurement.
+
+```
 # Keep only the feature columns containing either the 'mean' or 'std' strings 
 alldata <-
   select(alldata, subject, activity, contains(c("mean", "std"), ignore.case = FALSE))
-Uses descriptive activity names to name the activities in the data set
+```
+
+3) Uses descriptive activity names to name the activities in the data set
+
+```
 # Replace the numerical values with string values for activities
 alldata <-
   mutate(alldata, activity = activities$activity[alldata$activity]) # todo factorial
-Appropriately labels the data set with descriptive variable names.
+```
+
+4) Appropriately labels the data set with descriptive variable names.
+
+```
 # Clean and tidy column names
 labels <- names(alldata)
 labels <- gsub('^t', "time_", labels)
@@ -107,3 +126,4 @@ grouped_data <-
 # Write the summary dataset into a text file
 setwd("..")
 write.table(grouped_data, file = "summary_mean.txt", row.names = FALSE)
+```
